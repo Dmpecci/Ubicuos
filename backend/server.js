@@ -14,6 +14,7 @@ app.use(express.json());
 const acousticRoutes = require('./routes/acousticRoutes');
 app.use('/api/acoustics', acousticRoutes);
 
+// USer: davidmpe2002 Password: 1234567890
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('MongoDB connected'))

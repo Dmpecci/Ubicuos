@@ -44,8 +44,14 @@ export default function Accidentes() {
   // 2. Estado para tendencia diaria (últimos 30 días)
   const [trendData, setTrendData] = useState([]);
 
-  // 3. Estado para filtros
+  // 3. Estado para filtros y opciones
   const [filters, setFilters] = useState(defaultFilterState);
+  const [filterOptions, setFilterOptions] = useState({
+    districts: [],
+    types: [],
+    vehicles: [],
+    severity: [],
+  });
   const [activeFiltersString, setActiveFiltersString] = useState('');
 
   // 4. Estado para datos del mapa
@@ -115,7 +121,7 @@ export default function Accidentes() {
   const fetchMapData = useCallback(async () => {
     try {
       const params = buildQueryParams(filters);
-      const res = await axios.get('/api/accidents', { params });
+      const res = await axios.get('/api/accidents/data', { params });
       setMapAccidents(res.data);
 
       // Generar descripción de filtros activos
@@ -174,10 +180,24 @@ export default function Accidentes() {
     }
   }, [filters]);
 
-  // Efecto inicial: cargar KPI y tendencia
+  // Efecto inicial: cargar filtros, KPI y tendencia
   useEffect(() => {
-    fetchKpiData();
-    fetchTrendData();
+    const loadInitial = async () => {
+      try {
+        const res = await axios.get('/api/accidents/filters');
+        setFilterOptions({
+          districts: res.data.distritos || [],
+          types: res.data.tipos || [],
+          vehicles: res.data.vehiculos || [],
+          severity: res.data.lesividades || [],
+        });
+      } catch (err) {
+        console.error('Error cargando filtros', err);
+      }
+      fetchKpiData();
+      fetchTrendData();
+    };
+    loadInitial();
   }, [fetchKpiData, fetchTrendData]);
 
   // Efecto: cada vez que cambian filtros, recargar mapa y stats; tabla si está visible
@@ -263,25 +283,7 @@ export default function Accidentes() {
             <AccordionDetails>
               <MultiSelect
                 label="Distritos"
-                options={[
-                  'Centro',
-                  'Salamanca',
-                  'Chamartín',
-                  'Chamberí',
-                  'Latina',
-                  'Tetúan',
-                  'Retiro',
-                  'Arganzuela',
-                  'Carabanchel',
-                  'Usera',
-                  'Puente de Vallecas',
-                  'Villaverde',
-                  'Villa de Vallecas',
-                  'Moratalaz',
-                  'Ciudad Lineal',
-                  'Moncloa-Aravaca',
-                  // ...añade los que correspondan
-                ]}
+                options={filterOptions.districts}
                 selected={filters.districts}
                 onChange={handleDistrictsChange}
                 placeholder="Selecciona distrito..."
@@ -297,16 +299,7 @@ export default function Accidentes() {
             <AccordionDetails>
               <MultiSelect
                 label="Tipos de accidente"
-                options={[
-                  'Colisión frontal',
-                  'Colisión lateral',
-                  'Atropello a peatón',
-                  'Atropello a animal',
-                  'Colisión múltiple',
-                  'Vuelco',
-                  'Choque con obstáculo fijo',
-                  'Otro',
-                ]}
+                options={filterOptions.types}
                 selected={filters.types}
                 onChange={handleTypesChange}
                 placeholder="Selecciona tipo..."
@@ -322,18 +315,7 @@ export default function Accidentes() {
             <AccordionDetails>
               <MultiSelect
                 label="Vehículos"
-                options={[
-                  'Turismo',
-                  'Motocicleta <125cc',
-                  'Motocicleta ≥125cc',
-                  'Furgoneta/Camión ligero',
-                  'Camión pesado',
-                  'Autobús',
-                  'Autobús articulado',
-                  'Bicicleta',
-                  'Peatón',
-                  'Otro',
-                ]}
+                options={filterOptions.vehicles}
                 selected={filters.vehicles}
                 onChange={handleVehiclesChange}
                 placeholder="Selecciona vehículo..."
@@ -349,12 +331,7 @@ export default function Accidentes() {
             <AccordionDetails>
               <MultiSelect
                 label="Severidad"
-                options={[
-                  'Sin heridos',
-                  'Herido leve',
-                  'Herido grave',
-                  'Fallecido',
-                ]}
+                options={filterOptions.severity}
                 selected={filters.severity}
                 onChange={handleSeverityChange}
                 placeholder="Selecciona severidad..."

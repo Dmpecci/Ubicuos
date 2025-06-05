@@ -18,6 +18,8 @@ const AccidentSchema = new mongoose.Schema({
   sexo: { type: String },
   cod_lesividad: { type: Number },                 // podría ser null
   lesividad: { type: String },
+  lat: { type: Number },
+  lng: { type: Number },
   coordenada_x_utm: { type: String },              // "447894,521" (guardado como String)
   coordenada_y_utm: { type: String },              // "4476691,236"
   positiva_alcohol: { type: String },              // "N" u otro valor
@@ -25,6 +27,9 @@ const AccidentSchema = new mongoose.Schema({
 }, {
   timestamps: true,
 });
+
+// Índice geoespacial para lat/lng (si existen)
+AccidentSchema.index({ lat: 1, lng: 1 }, { name: 'lat_lng_index' });
 
 module.exports = mongoose.model('Accident', AccidentSchema, 'accidentalidad');
 

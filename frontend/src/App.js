@@ -7,8 +7,6 @@ import AccidentMap from './components/AccidentMap';
 import Aire from './pages/Aire';
 import Traffic from './pages/Traffic';
 import Home from './pages/Home';
-import Accidentes from './pages/Accidentes';
-
 
 function Dashboard() {
   return (
@@ -68,7 +66,6 @@ function App() {
         <Route path="/mapa" element={<MapView />} />
         <Route path="/modulo/aire" element={<AireView />} />
         <Route path="/modulo/trafico" element={<TrafficView />} />
-        <Route path="/modulo/accidentes" element={<Accidentes />} />
       </Routes>
     </Router>
   );

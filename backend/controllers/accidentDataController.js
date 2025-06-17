@@ -14,7 +14,14 @@ function convertUTMToLatLng(x, y) {
 // GET /api/accidents/data
 const getAccidentsData = async (req, res) => {
   try {
-    const { distrito, dateFrom, dateTo } = req.query;
+    const {
+      distrito,
+      dateFrom,
+      dateTo,
+      limit = 100,
+      offset = 0
+    } = req.query;
+
     const filter = {};
     if (distrito) filter.distrito = distrito;
     if (dateFrom || dateTo) {
@@ -22,6 +29,13 @@ const getAccidentsData = async (req, res) => {
       if (dateFrom) filter.fecha.$gte = new Date(dateFrom);
       if (dateTo) filter.fecha.$lte = new Date(dateTo);
     }
+
+    let lim = parseInt(limit, 10);
+    if (isNaN(lim) || lim <= 0) lim = 100;
+    if (lim > 500) lim = 500;
+    const skip = parseInt(offset, 10) || 0;
+
+    const totalCount = await Accident.countDocuments(filter);
 
     const accidents = await Accident.find(filter, {
       fecha: 1,
@@ -33,12 +47,18 @@ const getAccidentsData = async (req, res) => {
       coordenada_x_utm: 1,
       coordenada_y_utm: 1,
       _id: 0
-    }).lean();
+    })
+      .skip(skip)
+      .limit(lim)
+      .lean();
 
-    const result = accidents.map(acc => {
+    const data = accidents.map(acc => {
       let { lat, lng } = acc;
       if ((!lat || !lng) && acc.coordenada_x_utm && acc.coordenada_y_utm) {
-        const coords = convertUTMToLatLng(acc.coordenada_x_utm, acc.coordenada_y_utm);
+        const coords = convertUTMToLatLng(
+          acc.coordenada_x_utm,
+          acc.coordenada_y_utm
+        );
         lat = coords.lat;
         lng = coords.lng;
       }
@@ -52,7 +72,7 @@ const getAccidentsData = async (req, res) => {
       };
     });
 
-    res.json(result);
+    res.json({ data, totalCount });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

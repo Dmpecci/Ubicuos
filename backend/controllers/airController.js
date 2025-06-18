@@ -38,8 +38,20 @@ const getDailyNO2 = async (req, res) => {
   try {
     const { puntoMuestreo } = req.params;
 
-    const doc = await AirData.findOne({ MAGNITUD: 1, PUNTO_MUESTREO: puntoMuestreo })
-      .sort({ ANO: -1, MES: -1, DIA: -1 });
+    let query = {
+      MAGNITUD: 1,
+      PUNTO_MUESTREO: puntoMuestreo
+    };
+
+    if (req.query.fecha) {
+      const [year, month, day] = req.query.fecha.split('-').map(Number);
+      query.ANO = year;
+      query.MES = month;
+      query.DIA = day;
+    }
+
+    const doc = await AirData.findOne(query).sort({ ANO: -1, MES: -1, DIA: -1 });
+
 
     if (!doc) {
       return res.status(404).json({ message: 'Data not found' });
@@ -64,4 +76,45 @@ const getDailyNO2 = async (req, res) => {
   }
 };
 
-module.exports = { getAllAirData, getDailyNO2 };
+const getEstaciones = async (req, res) => {
+  try {
+    const estaciones = await AirData.aggregate([
+      {
+        $group: {
+          _id: { estacion: "$ESTACION", municipio: "$MUNICIPIO" },
+          punto: { $first: "$PUNTO_MUESTREO" }
+        }
+      },
+      {
+        $project: {
+          punto: 1,
+          nombre: {
+            $concat: [
+              "Estación ",
+              { $toString: "$_id.estacion" },
+              " (Municipio ",
+              { $toString: "$_id.municipio" },
+              ")"
+            ]
+          },
+          _id: 0
+        }
+      }
+    ]);
+
+    res.json(estaciones);
+  } catch (err) {
+    console.error("Error obteniendo estaciones:", err);
+    res.status(500).json({ message: "Error al obtener estaciones" });
+  }
+};
+
+
+
+module.exports = {
+  getAllAirData,
+  getDailyNO2,
+  getEstaciones
+};
+
+

@@ -22,45 +22,81 @@ const getAccidentsData = async (req, res) => {
       offset = 0
     } = req.query;
 
-    const filter = {};
-    if (distrito) filter.distrito = distrito;
-    if (dateFrom || dateTo) {
-      filter.fecha = {};
-      if (dateFrom) filter.fecha.$gte = new Date(dateFrom);
-      if (dateTo) filter.fecha.$lte = new Date(dateTo);
-    }
-
+    // Validar y limitar
     let lim = parseInt(limit, 10);
     if (isNaN(lim) || lim <= 0) lim = 100;
     if (lim > 500) lim = 500;
     const skip = parseInt(offset, 10) || 0;
 
-    const totalCount = await Accident.countDocuments(filter);
+    const pipeline = [];
 
-    const accidents = await Accident.find(filter, {
-      fecha: 1,
-      distrito: 1,
-      tipo_accidente: 1,
-      lesividad: 1,
-      lat: 1,
-      lng: 1,
-      coordenada_x_utm: 1,
-      coordenada_y_utm: 1,
-      _id: 0
-    })
-      .skip(skip)
-      .limit(lim)
-      .lean();
+    // Filtro por distrito
+    if (distrito) {
+      pipeline.push({ $match: { distrito } });
+    }
 
-    const data = accidents.map(acc => {
+    // Convertir string fecha → fechaISO
+    pipeline.push({
+      $addFields: {
+        fechaISO: {
+          $dateFromString: {
+            dateString: "$fecha",
+            format: "%d/%m/%Y",
+            onError: null,
+            onNull: null
+          }
+        }
+      }
+    });
+
+    // Asegurarse de que sea válida
+    pipeline.push({ $match: { fechaISO: { $ne: null } } });
+
+    // Filtro por rango de fecha
+    const matchFecha = {};
+    if (dateFrom) matchFecha.$gte = new Date(dateFrom);
+    if (dateTo) {
+      const toDate = new Date(dateTo);
+      toDate.setHours(23, 59, 59, 999);
+      matchFecha.$lte = toDate;
+    }
+    if (dateFrom || dateTo) {
+      pipeline.push({ $match: { fechaISO: matchFecha } });
+    }
+
+    // Copia del pipeline antes de paginar, para contar
+    const countPipeline = [...pipeline, { $count: 'count' }];
+    const countResult = await Accident.aggregate(countPipeline);
+    const totalCount = countResult[0]?.count || 0;
+
+    // Añadir paginación y proyección
+    pipeline.push(
+      { $sort: { fechaISO: 1 } },
+      { $skip: skip },
+      { $limit: lim },
+      {
+        $project: {
+          fecha: 1,
+          distrito: 1,
+          tipo_accidente: 1,
+          lesividad: 1,
+          lat: 1,
+          lng: 1,
+          coordenada_x_utm: 1,
+          coordenada_y_utm: 1
+        }
+      }
+    );
+
+    const raw = await Accident.aggregate(pipeline);
+
+    // Convertir UTM si es necesario
+    const data = raw.map(acc => {
       let { lat, lng } = acc;
       if ((!lat || !lng) && acc.coordenada_x_utm && acc.coordenada_y_utm) {
-        const coords = convertUTMToLatLng(
-          acc.coordenada_x_utm,
-          acc.coordenada_y_utm
-        );
-        lat = coords.lat;
-        lng = coords.lng;
+        const coords = convertUTMToLatLng(acc.coordenada_x_utm, acc.coordenada_y_utm);
+        lat = typeof coords.lat === 'number' ? coords.lat : null;
+        lng = typeof coords.lng === 'number' ? coords.lng : null;
       }
       return {
         fecha: acc.fecha,
@@ -74,9 +110,12 @@ const getAccidentsData = async (req, res) => {
 
     res.json({ data, totalCount });
   } catch (err) {
+    console.error('Error en getAccidentsData:', err);
     res.status(500).json({ message: err.message });
   }
 };
+
+
 
 // GET /api/accidents/filters
 const getAccidentFilters = async (req, res) => {
@@ -92,37 +131,70 @@ const getAccidentFilters = async (req, res) => {
 const getAccidentsKPI = async (req, res) => {
   try {
     const { distrito, dateFrom, dateTo } = req.query;
-    const filter = {};
-    if (distrito) filter.distrito = distrito;
-    if (dateFrom || dateTo) {
-      filter.fecha = {};
-      if (dateFrom) filter.fecha.$gte = new Date(dateFrom);
-      if (dateTo) filter.fecha.$lte = new Date(dateTo);
+
+    const pipeline = [];
+
+    if (distrito) {
+      pipeline.push({ $match: { distrito } });
     }
 
-    const total = await Accident.countDocuments(filter);
+    pipeline.push({
+      $addFields: {
+        fechaISO: {
+          $dateFromString: {
+            dateString: "$fecha",
+            format: "%d/%m/%Y",
+            onError: null,
+            onNull: null
+          }
+        }
+      }
+    });
 
-    const districtAgg = await Accident.aggregate([
-      { $match: filter },
-      { $group: { _id: '$distrito', count: { $sum: 1 } } },
-      { $sort: { count: -1 } },
-      { $limit: 1 }
-    ]);
-    const topDistrict = districtAgg[0] ? districtAgg[0]._id : null;
+    pipeline.push({ $match: { fechaISO: { $ne: null } } });
 
-    const typeAgg = await Accident.aggregate([
-      { $match: filter },
-      { $group: { _id: '$tipo_accidente', count: { $sum: 1 } } },
-      { $sort: { count: -1 } },
-      { $limit: 1 }
-    ]);
-    const topType = typeAgg[0] ? typeAgg[0]._id : null;
+    const matchFecha = {};
+    if (dateFrom) matchFecha.$gte = new Date(dateFrom);
+    if (dateTo) {
+      const toDate = new Date(dateTo);
+      toDate.setHours(23, 59, 59, 999);
+      matchFecha.$lte = toDate;
+    }
+
+    if (dateFrom || dateTo) {
+      pipeline.push({ $match: { fechaISO: matchFecha } });
+    }
+
+    // Total
+    pipeline.push({
+      $facet: {
+        total: [{ $count: 'value' }],
+        topDistrict: [
+          { $group: { _id: '$distrito', count: { $sum: 1 } } },
+          { $sort: { count: -1 } },
+          { $limit: 1 }
+        ],
+        topType: [
+          { $group: { _id: '$tipo_accidente', count: { $sum: 1 } } },
+          { $sort: { count: -1 } },
+          { $limit: 1 }
+        ]
+      }
+    });
+
+    const [result] = await Accident.aggregate(pipeline);
+    const total = result.total[0]?.value || 0;
+    const topDistrict = result.topDistrict[0]?._id || '-';
+    const topType = result.topType[0]?._id || '-';
 
     res.json({ total, topDistrict, topType });
+
   } catch (err) {
+    console.error('Error en getAccidentsKPI:', err);
     res.status(500).json({ message: err.message });
   }
 };
+
 
 module.exports = {
   getAccidentsData,

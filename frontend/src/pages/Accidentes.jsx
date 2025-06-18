@@ -5,13 +5,13 @@ import FiltrosAccidentes from '../components/FiltrosAccidentes';
 import KpiAccidentes from '../components/KpiAccidentes';
 
 export default function Accidentes() {
-  const today = new Date().toISOString().slice(0, 10);
-  const last30 = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
-    .toISOString()
-    .slice(0, 10);
+  const [filters, setFilters] = useState({
+    distrito: '',
+    dateFrom: '2051-01-01',
+    dateTo: '2051-01-03' // 2 días después, o el rango que desees
+  });
 
   const [distritos, setDistritos] = useState([]);
-  const [filters, setFilters] = useState({ distrito: '', dateFrom: last30, dateTo: today });
   const [accidents, setAccidents] = useState([]);
   const [kpi, setKpi] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -75,8 +75,13 @@ export default function Accidentes() {
 
   const resetFilters = () => {
     setOffset(0);
-    setFilters({ distrito: '', dateFrom: last30, dateTo: today });
+    setFilters({
+      distrito: '',
+      dateFrom: '2051-01-01',
+      dateTo: '2051-01-03'
+    });
   };
+
 
   return (
     <div style={{ padding: '20px' }}>

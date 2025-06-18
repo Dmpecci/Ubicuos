@@ -34,7 +34,7 @@ connectDB();
 
 // Rutas
 app.use('/api/acoustics', acousticRoutes);
-app.use('/api/air', airRoutes);
+app.use(airRoutes);
 app.use('/api/photovoltaic', photovoltaicRoutes);
 app.use('/api/accidents', accidentRoutes);
 app.use('/api/scooters', scooterRoutes);

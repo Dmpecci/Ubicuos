@@ -7,28 +7,45 @@ import {
 
 export default function Aire() {
   const [data, setData] = useState([]);
-  const [punto, setPunto] = useState('28079004_1_38');
+  const [puntoMuestreo, setPuntoMuestreo] = useState('28079004_1_38');
+  const [estaciones, setEstaciones] = useState([]);
+  const [fecha, setFecha] = useState('2051-01-01');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    axios
+      .get('/api/aire/estaciones')
+      .then(res => setEstaciones(res.data))
+      .catch(err => console.error('Error al cargar estaciones', err));
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await axios.get(`/api/aire/${punto}`);
+        const res = await axios.get(`/api/aire/${puntoMuestreo}?fecha=${fecha}`);
         const ordered = res.data.sort((a, b) => a.hora - b.hora);
+        if (ordered.length === 0) {
+          setError('No hay registros disponibles para esta fecha');
+        }
         setData(ordered);
       } catch (err) {
-        console.error('Error al obtener datos de aire', err);
-        setError('No se pudieron cargar los datos');
+        if (err.response && err.response.status === 404) {
+          setError('No hay registros disponibles para esta fecha');
+        } else {
+          console.error('Error al obtener datos de aire', err);
+          setError('No se pudieron cargar los datos');
+        }
+        setData([]);
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [punto]);
+  }, [puntoMuestreo, fecha]);
 
   const average =
     data.length > 0
@@ -46,11 +63,25 @@ export default function Aire() {
     <div style={{ padding: '20px' }}>
       <h3>Evolución horaria del NO₂</h3>
       <div style={{ marginBottom: '10px' }}>
-        <label>Punto de muestreo: </label>
+        <label>Estación: </label>
+        <select
+          value={puntoMuestreo}
+          onChange={(e) => setPuntoMuestreo(e.target.value)}
+          style={{ marginLeft: '10px' }}
+        >
+          {estaciones.map((est) => (
+            <option key={est.punto} value={est.punto}>
+              {est.nombre}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div style={{ marginBottom: '10px' }}>
+        <label>Fecha: </label>
         <input
-          type="text"
-          value={punto}
-          onChange={(e) => setPunto(e.target.value)}
+          type="date"
+          value={fecha}
+          onChange={(e) => setFecha(e.target.value)}
           style={{ marginLeft: '10px' }}
         />
       </div>

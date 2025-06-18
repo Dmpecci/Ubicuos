@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { getAllAirData } = require('../controllers/airController');
+const { getDailyNO2 } = require('../controllers/airController');
 
-// GET /api/air
-router.get('/', getAllAirData);
+router.get('/api/aire/:puntoMuestreo', getDailyNO2);
 
 module.exports = router;

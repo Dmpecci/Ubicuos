@@ -34,4 +34,34 @@ const getAllAirData = async (req, res) => {
   }
 };
 
-module.exports = { getAllAirData };
+const getDailyNO2 = async (req, res) => {
+  try {
+    const { puntoMuestreo } = req.params;
+
+    const doc = await AirData.findOne({ MAGNITUD: 1, PUNTO_MUESTREO: puntoMuestreo })
+      .sort({ ANO: -1, MES: -1, DIA: -1 });
+
+    if (!doc) {
+      return res.status(404).json({ message: 'Data not found' });
+    }
+
+    const resultados = [];
+
+    for (let i = 1; i <= 24; i++) {
+      const hora = String(i).padStart(2, '0');
+      const valor = doc[`H${hora}`];
+      const validacion = doc[`V${hora}`];
+
+      if (validacion === 'V' && valor !== undefined && valor !== null) {
+        resultados.push({ hora: i, valor });
+      }
+    }
+
+    res.status(200).json(resultados);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+module.exports = { getAllAirData, getDailyNO2 };

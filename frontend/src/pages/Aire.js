@@ -7,11 +7,12 @@ import {
 
 export default function Aire() {
   const [data, setData] = useState([]);
-  const [puntoMuestreo, setPuntoMuestreo] = useState('28079004_1_38');
   const [estaciones, setEstaciones] = useState([]);
-  const [fecha, setFecha] = useState('2051-01-01');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [puntoMuestreo, setPuntoMuestreo] = useState("28079036_1_38");
+  const [fecha, setFecha] = useState("2051-01-23");
+
 
   useEffect(() => {
     axios

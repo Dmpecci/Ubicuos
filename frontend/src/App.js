@@ -6,6 +6,7 @@ import AlertList from './components/AlertList';
 import AccidentMap from './components/AccidentMap';
 import Aire from './pages/Aire';
 import Traffic from './pages/Traffic';
+import MovilidadSostenible from './pages/MovilidadSostenible';
 import Home from './pages/Home';
 import Accidentes from './pages/Accidentes';
 
@@ -59,6 +60,7 @@ function App() {
           <Link to="/modulo/accidentes" style={linkStyle}>Accidentes</Link>
           <Link to="/modulo/aire" style={linkStyle}>Aire</Link>
           <Link to="/modulo/trafico" style={linkStyle}>Tráfico</Link>
+          <Link to="/movilidad" style={linkStyle}>Movilidad</Link>
         </nav>
       </header>
 
@@ -69,6 +71,7 @@ function App() {
         <Route path="/modulo/accidentes" element={<Accidentes />} />
         <Route path="/modulo/aire" element={<AireView />} />
         <Route path="/modulo/trafico" element={<TrafficView />} />
+        <Route path="/movilidad" element={<MovilidadSostenible />} />
       </Routes>
     </Router>
   );

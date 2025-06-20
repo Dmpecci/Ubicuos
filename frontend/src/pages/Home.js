@@ -23,7 +23,7 @@ export default function Home() {
         }}>
           <Link to="/modulo/accidentes" style={cardStyle}>🚧 Accidentes</Link>
           <Link to="/modulo/aire" style={cardStyle}>🌫️ Calidad del Aire</Link>
-          <Link to="/movilidad" style={cardStyle}>🚴‍♂️ Movilidad Sostenible</Link>
+          <Link to="/sostenibilidad" style={cardStyle}>🌱 Sostenibilidad Urbana</Link>
           <Link to="/dashboard" style={cardStyle}>📊 Dashboard</Link>
         </div>
       </section>
@@ -33,7 +33,7 @@ export default function Home() {
         <h3 style={{ color: '#003366', textAlign: 'center' }}>Nuestra misión</h3>
         <ul style={{ maxWidth: '800px', margin: '20px auto', lineHeight: '1.8rem' }}>
           <li>✔️ Reducir la accidentalidad y mejorar la seguridad</li>
-          <li>✔️ Optimizar la movilidad urbana sostenible</li>
+          <li>✔️ Optimizar la sostenibilidad urbana</li>
           <li>✔️ Promover el uso de energías renovables</li>
           <li>✔️ Evaluar y mejorar el entorno ambiental</li>
           <li>✔️ Potenciar decisiones públicas basadas en datos</li>

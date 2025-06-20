@@ -11,7 +11,7 @@ import {
   ResponsiveContainer
 } from 'recharts';
 
-export default function MovilidadSostenible() {
+export default function SostenibilidadUrbana() {
   const [datos, setDatos] = useState([]);
   const [filtroBusqueda, setFiltroBusqueda] = useState('');
   const [distritoSeleccionado, setDistritoSeleccionado] = useState(null);
@@ -56,7 +56,7 @@ export default function MovilidadSostenible() {
   return (
     <div style={{ padding: '20px' }}>
       <h2 style={{ fontSize: '24px', fontWeight: 'bold', marginTop: '30px' }}>
-        Índice de Movilidad Sostenible por Distrito
+        Índice de Sostenibilidad Urbana por Distrito
       </h2>
       <div
         style={{

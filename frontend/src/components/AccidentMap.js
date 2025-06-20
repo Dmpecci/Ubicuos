@@ -2,10 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import axios from 'axios';
 import * as utm from 'utm';
-
-const API_BASE = process.env.REACT_APP_API_BASE;
 import 'leaflet/dist/leaflet.css';
-
+const API_BASE = process.env.REACT_APP_API_BASE;
 function AccidentMap() {
   const [accidents, setAccidents] = useState([]);
 

@@ -5,8 +5,7 @@ import DashboardCards from './components/DashboardCards';
 import AlertList from './components/AlertList';
 import AccidentMap from './components/AccidentMap';
 import Aire from './pages/Aire';
-import Traffic from './pages/Traffic';
-import MovilidadSostenible from './pages/MovilidadSostenible';
+import SostenibilidadUrbana from './pages/SostenibilidadUrbana';
 import Home from './pages/Home';
 import Accidentes from './pages/Accidentes';
 
@@ -39,15 +38,6 @@ function AireView() {
   );
 }
 
-function TrafficView() {
-  return (
-    <div style={{ padding: '20px' }}>
-      <h2>Tráfico: Intensidad Promedio por Hora</h2>
-      <Traffic />
-    </div>
-  );
-}
-
 function App() {
   return (
     <Router>
@@ -59,8 +49,7 @@ function App() {
           <Link to="/mapa" style={linkStyle}>Mapa</Link>
           <Link to="/modulo/accidentes" style={linkStyle}>Accidentes</Link>
           <Link to="/modulo/aire" style={linkStyle}>Aire</Link>
-          <Link to="/modulo/trafico" style={linkStyle}>Tráfico</Link>
-          <Link to="/movilidad" style={linkStyle}>Movilidad</Link>
+          <Link to="/sostenibilidad" style={linkStyle}>Sostenibilidad Urbana</Link>
         </nav>
       </header>
 
@@ -70,8 +59,7 @@ function App() {
         <Route path="/mapa" element={<MapView />} />
         <Route path="/modulo/accidentes" element={<Accidentes />} />
         <Route path="/modulo/aire" element={<AireView />} />
-        <Route path="/modulo/trafico" element={<TrafficView />} />
-        <Route path="/movilidad" element={<MovilidadSostenible />} />
+        <Route path="/sostenibilidad" element={<SostenibilidadUrbana />} />
       </Routes>
     </Router>
   );

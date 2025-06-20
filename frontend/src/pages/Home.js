@@ -22,9 +22,8 @@ export default function Home() {
           marginTop: '30px'
         }}>
           <Link to="/modulo/accidentes" style={cardStyle}>🚧 Accidentes</Link>
-          <Link to="/modulo/trafico" style={cardStyle}>🚗 Tráfico</Link>
           <Link to="/modulo/aire" style={cardStyle}>🌫️ Calidad del Aire</Link>
-          <Link to="/mapa" style={cardStyle}>🗺️ Mapa General</Link>
+          <Link to="/movilidad" style={cardStyle}>🚴‍♂️ Movilidad Sostenible</Link>
           <Link to="/dashboard" style={cardStyle}>📊 Dashboard</Link>
         </div>
       </section>

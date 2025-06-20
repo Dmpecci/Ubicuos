@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+
+const API_BASE = process.env.REACT_APP_API_BASE;
 import { Line } from 'react-chartjs-2';
 import 'chart.js/auto';
 
@@ -7,7 +9,7 @@ export default function Traffic() {
   const [datosPorHora, setDatosPorHora] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/traffic-data')
+    axios.get(`${API_BASE}/api/traffic-data`)
       .then(res => {
         const registros = res.data;
 

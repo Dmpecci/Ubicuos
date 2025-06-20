@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
+const API_BASE = process.env.REACT_APP_API_BASE;
+
 function AlertList() {
   const [alerts, setAlerts] = useState([]);
 
@@ -10,7 +12,7 @@ function AlertList() {
 
       // Aire: NO2 > 180
       try {
-        const resAir = await axios.get('http://localhost:5000/api/air');
+        const resAir = await axios.get(`${API_BASE}/api/air`);
         const airData = resAir.data.filter(d => parseFloat(d.NO2?.replace(',', '.')) > 180);
         if (airData.length > 0) {
           newAlerts.push(`🚨 Calidad del aire crítica: ${airData.length} lecturas con NO₂ > 180`);
@@ -21,7 +23,7 @@ function AlertList() {
 
       // Tráfico: intensidad > 3000
       try {
-        const resTraffic = await axios.get('http://localhost:5000/api/traffic-data');
+        const resTraffic = await axios.get(`${API_BASE}/api/traffic-data`);
         const highTraffic = resTraffic.data.filter(d => d.intensidad > 3000);
         if (highTraffic.length > 0) {
           newAlerts.push(`🚦 Tráfico muy denso: ${highTraffic.length} lecturas con intensidad > 3000`);
@@ -32,7 +34,7 @@ function AlertList() {
 
       // Accidentes: más de 10 en un distrito
       try {
-        const resAccidents = await axios.get('http://localhost:5000/api/accidents');
+        const resAccidents = await axios.get(`${API_BASE}/api/accidents`);
         const distritos = {};
         resAccidents.data.forEach(acc => {
           if (!acc.distrito) return;

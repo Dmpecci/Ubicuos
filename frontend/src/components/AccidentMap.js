@@ -2,13 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import axios from 'axios';
 import * as utm from 'utm';
+
+const API_BASE = process.env.REACT_APP_API_BASE;
 import 'leaflet/dist/leaflet.css';
 
 function AccidentMap() {
   const [accidents, setAccidents] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/accidents')
+    axios.get(`${API_BASE}/api/accidents`)
       .then(res => {
         const filtered = res.data
           .filter(acc => acc.coordenada_x_utm && acc.coordenada_y_utm)

@@ -37,6 +37,8 @@ export default function MovilidadSostenible() {
   };
 
   const datosFiltrados = filtrarDatos();
+  console.log('📊 Datos filtrados:', datosFiltrados);
+
 
   const ranking = distritoSeleccionado
     ? datos

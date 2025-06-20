@@ -26,4 +26,5 @@ const AcousticDataSchema = new mongoose.Schema({
   timestamps: true,
 });
 
-module.exports = mongoose.model('AcousticData', AcousticDataSchema);
+module.exports = mongoose.model('AcousticData', AcousticDataSchema, 'contaminacionAcustica');
+

@@ -34,4 +34,5 @@ const AcousticMeasurementStationSchema = new mongoose.Schema({
   timestamps: true,
 });
 
-module.exports = mongoose.model('AcousticMeasurementStation', AcousticMeasurementStationSchema);
+module.exports = mongoose.model('AcousticMeasurementStation', AcousticMeasurementStationSchema, 'estacionesMedidaControlAcustico');
+

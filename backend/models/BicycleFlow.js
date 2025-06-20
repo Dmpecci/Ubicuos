@@ -18,4 +18,5 @@ const BicycleFlowSchema = new mongoose.Schema({
   timestamps: true,
 });
 
-module.exports = mongoose.model('BicycleFlow', BicycleFlowSchema);
+module.exports = mongoose.model('BicycleFlow', BicycleFlowSchema, 'bicicletasAforo');
+

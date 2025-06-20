@@ -62,3 +62,12 @@ app.use(dashboardRoutes);
 // Arrancar el servidor
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, '0.0.0.0', () => console.log(`Server running on port ${PORT}`));
+const path = require('path');
+
+// Servir archivos estáticos del frontend
+app.use(express.static(path.join(__dirname, '../frontend/build')));
+
+// Redirigir todas las rutas no API al index.html del frontend
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/build/index.html'));
+});

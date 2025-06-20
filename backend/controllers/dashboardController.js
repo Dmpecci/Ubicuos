@@ -19,7 +19,7 @@ const getDashboardSummary = async (req, res) => {
       BicycleFlow.countDocuments(),
       ScooterAssignment.aggregate([{ $group: { _id: null, total: { $sum: '$TOTAL' } } }]),
       Photovoltaic.countDocuments(),
-      RegulatedParkingStreet.aggregate([{ $group: { _id: null, total: { $sum: '$numPlazas' } } }]),
+      RegulatedParkingStreet.aggregate([{ $group: { _id: null, total: { $sum: '$num_plazas' } } }]),
       Accident.countDocuments()
     ]);
 

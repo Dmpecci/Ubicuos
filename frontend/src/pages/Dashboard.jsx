@@ -5,7 +5,7 @@ import AlertList from '../components/AlertList';
 export default function Dashboard() {
   return (
     <div style={{ padding: '20px' }}>
-      <h2>Dashboard General</h2>
+      <h2 style={{ textAlign: 'center' }}>Dashboard de Sostenibilidad Urbana</h2>
       <DashboardCards />
       <AlertList />
     </div>

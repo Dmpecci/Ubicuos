@@ -1,24 +1,13 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 
-import DashboardCards from './components/DashboardCards';
-import AlertList from './components/AlertList';
+import Dashboard from './pages/Dashboard';
 import AccidentMap from './components/AccidentMap';
 import Aire from './pages/Aire';
 import SostenibilidadUrbana from './pages/SostenibilidadUrbana';
 import Home from './pages/Home';
 import Accidentes from './pages/Accidentes';
 
-function Dashboard() {
-  return (
-    <div style={{ padding: '20px' }}>
-      <h2>Dashboard General</h2>
-      <DashboardCards />
-      <h2 style={{ marginTop: '40px' }}>Alertas del Sistema</h2>
-      <AlertList />
-    </div>
-  );
-}
 
 function MapView() {
   return (

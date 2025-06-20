@@ -26,6 +26,7 @@ const lostObjectRoutes = require('./routes/lostObjectRoutes');
 const taxiStopReservationRoutes = require('./routes/taxiStopReservationRoutes');
 const trafficDataRoutes = require('./routes/trafficDataRoutes');
 const locationRoutes = require('./routes/locationRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
 const app = express();
 
 // Middlewares
@@ -57,6 +58,7 @@ app.use('/api/lost-objects', lostObjectRoutes);
 app.use('/api/taxi-stop-reservations', taxiStopReservationRoutes);
 app.use('/api/traffic-data', trafficDataRoutes);
 app.use('/api/locations', locationRoutes);
-// Arrancar el servidor   
+app.use(dashboardRoutes);
+// Arrancar el servidor
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

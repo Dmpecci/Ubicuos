@@ -15,4 +15,4 @@ const RegulatedParkingStreetSchema = new mongoose.Schema({
   timestamps: true,
 });
 
-module.exports = mongoose.model('RegulatedParkingStreet', RegulatedParkingStreetSchema);
+module.exports = mongoose.model('RegulatedParkingStreet', RegulatedParkingStreetSchema, 'callesEstacionamientoRegulado');

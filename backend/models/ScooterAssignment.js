@@ -23,4 +23,4 @@ const ScooterAssignmentSchema = new mongoose.Schema({
   TOTAL: { type: Number, default: 0 },
 }, { timestamps: true });
 
-module.exports = mongoose.model('ScooterAssignment', ScooterAssignmentSchema);
+module.exports = mongoose.model('ScooterAssignment', ScooterAssignmentSchema, 'asignacionPatinetes');

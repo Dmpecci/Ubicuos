@@ -20,4 +20,4 @@ const PhotovoltaicSchema = new mongoose.Schema({
   timestamps: true 
 });
 
-module.exports = mongoose.model('Photovoltaic', PhotovoltaicSchema);
+module.exports = mongoose.model('Photovoltaic', PhotovoltaicSchema, 'InstalacionesFotovoltaicas');

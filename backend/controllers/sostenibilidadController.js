@@ -20,9 +20,9 @@ const getSustainabilityIndex = async (req, res) => {
     ]);
 
     // 2. Bicicletas
+    // Filtramos por una fecha concreta para evitar sumas desproporcionadas
     const bicycleAgg = await BicycleFlow.aggregate([
-      // Descomenta esto si quieres limitar por fecha específica
-      // { $match: { FECHA: { $regex: /^01\/01\/2051/ } } },
+      { $match: { FECHA: { $regex: /^01\/01\/2051/ } } },
       { $group: { _id: '$DISTRITO', value: { $sum: '$BICICLETAS' } } }
     ]);
 
@@ -34,21 +34,13 @@ const getSustainabilityIndex = async (req, res) => {
     // 4. Plazas SER (limpiando correctamente el nombre de distrito)
     const serAgg = await RegulatedParkingStreet.aggregate([
       {
-        $project: {
-          distrito: {
-            $trim: {
-              input: {
-                $arrayElemAt: [ { $split: [ "$distrito", "  " ] }, 1 ]
-              }
-            }
-          },
-          num_plazas: "$num_plazas"
-        }
-      },
-      {
         $group: {
-          _id: "$distrito",
-          value: { $sum: "$num_plazas" }
+          _id: '$distrito',
+          value: {
+            $sum: {
+              $ifNull: ['$num_plazas', '$numPlazas']
+            }
+          }
         }
       }
     ]);
@@ -58,28 +50,28 @@ const getSustainabilityIndex = async (req, res) => {
     scooterAgg.forEach(({ _id, value }) => {
       const d = cleanDistrict(_id);
       if (!d) return;
-      scooters[d] = value || 0;
+      scooters[d] = (scooters[d] || 0) + (value || 0);
     });
 
     const bicycles = {};
     bicycleAgg.forEach(({ _id, value }) => {
       const d = cleanDistrict(_id);
       if (!d) return;
-      bicycles[d] = value || 0;
+      bicycles[d] = (bicycles[d] || 0) + (value || 0);
     });
 
     const solars = {};
     solarAgg.forEach(({ _id, value }) => {
       const d = cleanDistrict(_id);
       if (!d) return;
-      solars[d] = value || 0;
+      solars[d] = (solars[d] || 0) + (value || 0);
     });
 
     const ser = {};
     serAgg.forEach(({ _id, value }) => {
       const d = cleanDistrict(_id);
       if (!d) return;
-      ser[d] = value || 0;
+      ser[d] = (ser[d] || 0) + (value || 0);
     });
 
     // Unir todos los distritos
